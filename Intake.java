@@ -9,6 +9,7 @@ import com.rowanmcalpin.nextftc.core.control.controllers.feedforward.StaticFeedf
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 import com.qualcomm.robotcore.hardware.DcMotor; // <-- needed for ZeroPowerBehavior
+import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToVelocity;
 
 public class Intake extends Subsystem {
     // BOILERPLATE
@@ -21,8 +22,9 @@ public class Intake extends Subsystem {
         public static double kI = 0.0;
         public static double kD = 0.001;
 
-        public static int BOOTROTATE_SPEED = -20;
-        public static int EXTENDED_TICKS = 680;
+        public static int BOOTROTATE_SPEED = 20;
+        public static int BACKWARDSPEED = 80;
+        public static int FORWARDSPEED = -80;
     }
 
     // USER CODE
@@ -37,21 +39,30 @@ public class Intake extends Subsystem {
 
     public String name = "intakeMotor";
 
-    public Command retracted() {
-        return new RunToPosition(
+    public Command rotatingBackward() {
+        return new RunToVelocity(
                 intakeMotor, // MOTOR TO MOVE
-                IntakeConstants.BOOTROTATE_SPEED, // TARGET POSITION
+                IntakeConstants.BACKWARDSPEED, // TARGET POSITION
                 controller, // CONTROLLER
                 this        // SUBSYSTEM
         );
     }
 
-    public Command extended() {
-        return new RunToPosition(
+    public Command rotatingForward() {
+        return new RunToVelocity(
                 intakeMotor, // MOTOR TO MOVE
-                IntakeConstants.EXTENDED_TICKS, // TARGET POSITION
+                IntakeConstants.FORWARDSPEED, // TARGET POSITION
                 controller, // CONTROLLER
                 this        // SUBSYSTEM
+        );
+    }
+
+    public Command bootRotating() {
+            return new RunToVelocity(
+            intakeMotor,
+            IntakeConstants.BOOTROTATE_SPEED,
+            controller,
+                    this
         );
     }
 
