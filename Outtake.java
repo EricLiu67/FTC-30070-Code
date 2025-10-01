@@ -14,7 +14,9 @@ import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToVelocity;
 public class Outtake extends Subsystem {
     // BOILERPLATE
     public static final Outtake INSTANCE = new Outtake();
-    private Outtake() { }
+
+    private Outtake() {
+    }
 
     @Config
     public static class OuttakeConstants {
@@ -44,6 +46,19 @@ public class Outtake extends Subsystem {
                 controller,
                 this
         );
+    }
+
+    public Command OuttakeNotRotating() {
+        if (OuttakeRotating().isDone()) {
+
+            return new RunToVelocity(
+                    outtakeMotor,
+                    0,
+                    controller,
+                    this
+            );
+        }
+        return null;
     }
 
     @Override
