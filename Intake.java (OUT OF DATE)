@@ -75,3 +75,4 @@ public class Intake extends Subsystem {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 }
+
