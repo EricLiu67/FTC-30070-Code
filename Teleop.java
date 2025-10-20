@@ -67,7 +67,7 @@ public class Teleop extends LinearOpMode {
             }
 
             if (gamepad1.cross) {
-                outtakeMotor.setPower(-0.6);
+                outtakeMotor.setPower(-0.5);
                 while (outtakeMotor.getVelocity() < 0.5) {
                     sleep(10);
                 }
