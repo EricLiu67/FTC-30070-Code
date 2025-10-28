@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
+import com.qualcomm.hardware.lynx.LynxModule;
+
+import java.util.List;
 
 
 @TeleOp
@@ -33,8 +35,14 @@ public class Teleop extends LinearOpMode {
         DcMotor intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
         DcMotorEx outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
 
-        Servo servo1 = hardwareMap.get(Servo.class, "leftServo");
-        Servo servo2 = hardwareMap.get(Servo.class, "rightServo");
+        outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        Servo blockServo = hardwareMap.get(Servo.class, "rightServo");
+
+        boolean test = false;
+
+        blockServo.setPosition(0.5);
+
 // Reverse the right side motors. This may be wrong for your setup.
 // If your robot moves backwards when commanded to go forwards,
 // reverse the left side instead.
@@ -60,29 +68,24 @@ public class Teleop extends LinearOpMode {
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
+            double velocity = outtakeMotor.getVelocity();
+
             if (gamepad1.right_trigger > 0.3) {
-                intakeMotor.setPower(1);
+                blockServo.setPosition(0.75);
+                intakeMotor.setPower(0.3);
             } else {
                 intakeMotor.setPower(0);
+                blockServo.setPosition(0.5);
             }
 
             if (gamepad1.cross) {
-                outtakeMotor.setPower(-0.5);
-                while (outtakeMotor.getVelocity() < 0.5) {
-                    sleep(10);
-                }
-
-                servo1.setPosition(0.0);
-                servo2.setPosition(1.0);
-
-                while (outtakeMotor.getVelocity() < 0.5) {
-                    sleep(10);
-                }
-
-                intakeMotor.setPower(-0.4);
-                sleep(500);
-                servo1.setPosition(0.0);
-                servo2.setPosition(1.0);
+                outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); // Reset
+                outtakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // Set mode
+                blockServo.setPosition(0.5);
+                outtakeMotor.setPower(-0.6);// Set power
+                intakeMotor.setPower(-0.3);
+                sleep(100);
+                intakeMotor.setPower(0);
             }
 
             if (gamepad1.triangle) {
@@ -96,16 +99,27 @@ public class Teleop extends LinearOpMode {
                 intakeMotor.setPower(-0.4);
             }
 
-            if (gamepad1.right_bumper) {
-                servo1.setPosition(0.0);
-                servo2.setPosition(1.0);
-            } else if (gamepad1.left_bumper) {
-                servo1.setPosition(1.0);
-                servo2.setPosition(0.0);
-            } else {
-                servo1.setPosition(0.5);
-                servo2.setPosition(0.5);
+            if (gamepad1.dpad_left) {
+                while (outtakeMotor.getVelocity() != 0) {
+                    if (outtakeMotor.getVelocity() > 50) {
+                        outtakeMotor.setPower(-0.2);
+                    } else if (outtakeMotor.getVelocity() < -50) {
+                        outtakeMotor.setPower(0.2);
+                    } else {
+                        outtakeMotor.setPower(0);
+                    }
+                }
             }
+
+
+            if (gamepad1.left_trigger > 0.3) {
+                intakeMotor.setPower(gamepad1.left_trigger);
+            }
+
+                telemetry.addData("outtakeVelocity", velocity);
+                telemetry.addData("servoDir", blockServo.getPosition());
+                telemetry.update();
+
 
         }
     }
